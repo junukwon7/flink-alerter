@@ -42,11 +42,11 @@ def main(argv):
     try:
         opts,args = getopt.getopt(argv,"hH:p:j:c:res",["help","flinkHost=","flinkPort=","jobList=","launchJobCommand=","autoRestart","sendEmail","sendSlack"])
     except getopt.GetoptError:
-        print 'Usage:\nwatchdog_flink_jobs.py -H <flinkHost> -p <flinkPort> -j <commaJobList> -c <launchCommand> -r <autoRestart> -e <sendEmail> -s <sendSlack>\n'
+        print('Usage:\nwatchdog_flink_jobs.py -H <flinkHost> -p <flinkPort> -j <commaJobList> -c <launchCommand> -r <autoRestart> -e <sendEmail> -s <sendSlack>\n')
         sys.exit(2) 
     for opt,arg in opts:
         if opt in ("-h","--help"):
-            print 'Usage:\nwatchdog_flink_jobs.py -H <flinkHost> -p <flinkPort> -j <commaJobList> -c <launchCommand> -r <autoRestart> -e <emailConfig> -s <slackConfig>\n'
+            print('Usage:\nwatchdog_flink_jobs.py -H <flinkHost> -p <flinkPort> -j <commaJobList> -c <launchCommand> -r <autoRestart> -e <emailConfig> -s <slackConfig>\n')
             sys.exit()
         elif opt in ("-H","--flinkHost"):
             flinkHost=arg
@@ -69,7 +69,7 @@ def main(argv):
 
 def checkAlarm(flinkHost, flinkPort, watchingJobList, launchJobCommand, automaticRestart, sendEmail, emailConfig, sendSlack, slackConfig):
     # Starting watchingJobs check
-    print str(datetime.datetime.now()) + ' Ejecutando watchdog para flink en: ' + flinkHost + ':' + flinkPort
+    print(str(datetime.datetime.now()) + ' Ejecutando watchdog para flink en: ' + flinkHost + ':' + flinkPort)
 
     # Get running jobs from flink
     runningJobList = getFlinkRunningJobList(flinkHost,flinkPort)
@@ -97,19 +97,19 @@ def isRunning(watchingJob, runningJobList):
     
     for runningJob in runningJobList:
         if watchingJob == runningJob['name']:
-            print str(datetime.datetime.now()) + ' INFO: ' + 'Job ' + watchingJob + ' is working!'
+            print(str(datetime.datetime.now()) + ' INFO: ' + 'Job ' + watchingJob + ' is working!')
             return True
     
-    print str(datetime.datetime.now()) + ' ERROR: ' + 'Job ' + watchingJob + ' has failed.'
+    print(str(datetime.datetime.now()) + ' ERROR: ' + 'Job ' + watchingJob + ' has failed.')
     return False
 
 def runJob(jobName, launchJobCommand):
  
-    print str(datetime.datetime.now()) + 'Restarting ' + jobName + ' job...'
+    print(str(datetime.datetime.now()) + 'Restarting ' + jobName + ' job...')
     launchJobNameCommand = launchJobCommand.replace('#JOBNAME',jobName)
-    print str(datetime.datetime.now()) + 'Launching command ' + launchJobNameCommand
+    print(str(datetime.datetime.now()) + 'Launching command ' + launchJobNameCommand)
     result = subprocess.run(launchJobNameCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print result.stdout
+    print(result.stdout)
 
 def getFlinkRunningJobList(flinkHost,flinkPort):
  
@@ -142,7 +142,7 @@ def getException(flinkHost, flinkPort, failedJobName):
             exception = 'Stopped without exception.'
     else:
         exception = "No se han encontrado excepciones para el job"
-    print exception
+    print(exception)
     return exception
 
 def sendEmail(config, alert):
@@ -161,7 +161,7 @@ def sendEmail(config, alert):
     server.login(emailConfig['login'],emailConfig['password'])
     problems = server.sendmail(emailConfig['from_addr'], emailConfig['to_addr_list'], message)
     server.quit()
-    print datetime.datetime.now() + 'Succesfully sended email'
+    print(datetime.datetime.now() + 'Succesfully sent email')
 
 def sendSlack(config, alert):
     # Set the webhook_url to the one provided by Slack when you create the webhook at https://my.slack.com/services/new/incoming-webhook/
@@ -174,7 +174,7 @@ def sendSlack(config, alert):
     if response.status_code != 200:
         raise ValueError('Request to slack returned an error %s, the response is:\n%s' % (response.status_code, response.text))
     else:
-        print datetime.datetime.now() + 'Succesfully sended slack'
+        print(datetime.datetime.now() + 'Succesfully sended slack')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
